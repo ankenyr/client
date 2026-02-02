@@ -1,0 +1,10 @@
+{
+    "name": "invariant client",
+    "features": {
+        "ghcr.io/devcontainers/features/python:1.3": {
+			"installTools": true,
+			"version": "3.12"
+		},
+		"ghcr.io/guiyomh/features/vim:0": {}
+    }
+}
