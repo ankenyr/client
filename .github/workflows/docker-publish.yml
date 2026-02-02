@@ -47,23 +47,19 @@ jobs:
       - name: Resolve package and Python versions
         id: versions
         run: |
-          set -e
+          set -euo pipefail
 
+          # Python version from the runner (matches python:3.12 base major/minor)
           PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
 
-          INVARIANT_VERSION=$(python3 - <<'EOF'
-          import json, subprocess
-          subprocess.run(
-              ["pip", "install", "--disable-pip-version-check", "--quiet", "invariant-client"],
-              check=True
-          )
-          import invariant_client
-          print(invariant_client.__version__)
-          EOF
-          )
+          # Install invariant-client to get the CLI
+          pip install --disable-pip-version-check --quiet invariant-client
 
-          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
-          echo "invariant_version=$INVARIANT_VERSION" >> $GITHUB_OUTPUT
+          # Extract client version from `invariant version`
+          INVARIANT_VERSION=$(invariant version | awk '/^client:/ {print $2}' | sed 's/^v//')
+
+          echo "python_version=${PYTHON_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "invariant_version=${INVARIANT_VERSION}" >> "$GITHUB_OUTPUT"
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
