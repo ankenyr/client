@@ -5,6 +5,4 @@ LABEL invariant_client_version="2.1.0"
 
 WORKDIR /usr/client
 
-RUN apt-get update
-
 RUN pip3 install invariant-client
