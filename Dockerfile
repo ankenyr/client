@@ -1,7 +1,10 @@
 FROM python:3.12-slim
 
-LABEL python_version="3.12"
-LABEL invariant_client_version="2.1.0"
+ARG INVARIANT_VERSION
+ARG PYTHON_VERSION
+
+LABEL invariant_client_version="${INVARIANT_VERSION}"
+LABEL python_version="${PYTHON_VERSION}"
 
 WORKDIR /usr/client
 
