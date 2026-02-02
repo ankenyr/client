@@ -45,25 +45,25 @@ jobs:
         with:
           cosign-release: 'v2.2.4'
       - name: Resolve package and Python versions
-  id: versions
-  run: |
-    set -e
+        id: versions
+        run: |
+          set -e
 
-    PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
+          PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
 
-    INVARIANT_VERSION=$(python3 - <<'EOF'
-    import json, subprocess
-    subprocess.run(
-        ["pip", "install", "--disable-pip-version-check", "--quiet", "invariant-client"],
-        check=True
-    )
-    import invariant_client
-    print(invariant_client.__version__)
-    EOF
-    )
+          INVARIANT_VERSION=$(python3 - <<'EOF'
+          import json, subprocess
+          subprocess.run(
+              ["pip", "install", "--disable-pip-version-check", "--quiet", "invariant-client"],
+              check=True
+          )
+          import invariant_client
+          print(invariant_client.__version__)
+          EOF
+          )
 
-        echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
-        echo "invariant_version=$INVARIANT_VERSION" >> $GITHUB_OUTPUT
+          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
+          echo "invariant_version=$INVARIANT_VERSION" >> $GITHUB_OUTPUT
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
