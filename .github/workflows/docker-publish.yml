@@ -83,7 +83,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           sbom: true                 # ✅ SBOM generated
-          provenance: false          # we attest via cosign
+          provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -109,7 +109,7 @@ jobs:
             ${IMAGE}@${DIGEST}
 
       # ---- PROVENANCE ATTESTATION ----
-      - name: Cosign attest provenance
+      - name: Attest image provenance
         if: github.event_name != 'pull_request'
         env:
           IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -117,6 +117,5 @@ jobs:
         run: |
           cosign attest \
             --yes \
-            --predicate <(cosign generate-attestation provenance) \
             --type slsaprovenance \
             ${IMAGE}@${DIGEST}
