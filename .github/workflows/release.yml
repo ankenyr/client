@@ -97,9 +97,9 @@ jobs:
       - name: Download artifacts directories # goes to current working directory
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
       - name: Remove signature # pypi will not ignore the signatures anymore and does not support them.
-        run: rm -f built-packages/invariant-client-*.sigstore
+        run: rm -f built-packages/*.sigstore
       - name: Remove signature json
-        run: rm -f built-packages/invariant-client-*.sigstore.json
+        run: rm -f built-packages/*.sigstore.json
       - name: publish
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
@@ -122,6 +122,7 @@ jobs:
         # created the release that triggered the action.
         uses: softprops/action-gh-release@b21b43df682dab285bf5146c1955e7f3560805f8 # v1
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           # smoketest-artifacts/ contains the signatures and certificates.
           files: |
             built-packages/*
