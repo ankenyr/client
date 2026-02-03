@@ -6,6 +6,9 @@ ARG PYTHON_VERSION
 LABEL invariant_client_version="${INVARIANT_VERSION}"
 LABEL python_version="${PYTHON_VERSION}"
 
-WORKDIR /usr/client
+WORKDIR /data
 
 RUN pip3 install invariant-client
+
+ENTRYPOINT ["invariant"]
+
