@@ -107,15 +107,3 @@ jobs:
             --predicate <(cosign download sbom ${IMAGE}@${DIGEST}) \
             --type spdx \
             ${IMAGE}@${DIGEST}
-
-      # ---- PROVENANCE ATTESTATION ----
-      - name: Attest image provenance
-        if: github.event_name != 'pull_request'
-        env:
-          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: |
-          cosign attest \
-            --yes \
-            --type slsaprovenance \
-            ${IMAGE}@${DIGEST}
