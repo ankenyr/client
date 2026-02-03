@@ -97,9 +97,9 @@ jobs:
       - name: Download artifacts directories # goes to current working directory
         uses: actions/download-artifact@v4
       - name: Remove signature # pypi will not ignore the signatures anymore and does not support them.
-        run: rm -f built-packages/aerleon-*.sigstore
+        run: rm -f built-packages/invariant-client-*.sigstore
       - name: Remove signature json
-        run: rm -f built-packages/aerleon-*.sigstore.json
+        run: rm -f built-packages/invariant-client-*.sigstore.json
       - name: publish
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -130,6 +130,7 @@ jobs:
 #######
   release-docker:
     runs-on: ubuntu-latest
+    needs: [release-pypi]
     permissions:
       contents: read
       packages: write
