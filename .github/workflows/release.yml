@@ -103,7 +103,6 @@ jobs:
       - name: publish
         uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
-          repository-url: https://test.pypi.org/legacy/
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
           packages_dir: built-packages/
@@ -150,22 +149,23 @@ jobs:
         run: |
           set -euo pipefail
 
-          PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
           echo "Waiting for invariant-client==$TAG_VERSION..."
 
           for i in {1..30}; do
-            if pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple --disable-pip-version-check --quiet "invariant-client==$TAG_VERSION"; then
+            if pip install --disable-pip-version-check --quiet "invariant-client==$TAG_VERSION"; then
               break
             fi
             echo "Version $TAG_VERSION not found, retrying in 10s..."
             sleep 10
           done
 
-          INVARIANT_VERSION=$(invariant version | awk '/^client:/ {print $2}' | sed 's/^v//')
+          INVARIANT_VERSION=$(python3 - <<'EOF'
+          from importlib.metadata import version
+          print(version("invariant-client"))
+          EOF
+          )
 
-          echo "python_version=${PYTHON_VERSION}" >> "$GITHUB_OUTPUT"
           echo "invariant_version=${INVARIANT_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
@@ -211,7 +211,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             INVARIANT_VERSION=${{ steps.versions.outputs.invariant_version }}
-            PYTHON_VERSION=${{ steps.versions.outputs.python_version }}
             BUILD_DATE=${{ steps.date.outputs.date }}
             VCS_REF=${{ github.sha }}
           sbom: true
@@ -237,11 +236,3 @@ jobs:
             --predicate <(cosign download sbom ${IMAGE}@${DIGEST}) \
             --type spdx \
             ${IMAGE}@${DIGEST}
-      - name: Update Docker Hub README
-        uses: peter-evans/dockerhub-description@432a30c9e07499fd01da9f8a49f0faf9e0ca5b77 # v4.0.2
-        if: github.event_name != 'pull_request'
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: invarianttech/client
-          readme-filepath: ./CONTAINER_README.md
